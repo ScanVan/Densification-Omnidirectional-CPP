@@ -30,3 +30,8 @@
 *.exe
 *.out
 *.app
+/Debug/
+
+# Data
+/data_in/
+/data_out/
