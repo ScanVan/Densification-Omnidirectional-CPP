@@ -15,7 +15,6 @@
 #include <opencv4/opencv2/opencv.hpp>
 #include <opencv4/opencv2/highgui/highgui.hpp>
 
-#include "cartesian2Spherical.hpp"
 #include <cmath>
 #include "transformation.hpp"
 #include <memory>

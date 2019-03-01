@@ -10,13 +10,15 @@
 #include <opencv4/opencv2/opencv.hpp>
 #include <opencv4/opencv2/highgui/highgui.hpp>
 
-#include "cartesian2Spherical.hpp"
 #include <cmath>
 #include <memory>
+#include "log.hpp"
 
 template <typename T>
 class EquiPair {
 public:
+	Log mt {}; // for measuring time
+
 	std::shared_ptr<cv::Mat> equi1 { };
 	std::shared_ptr<cv::Mat> equi2 { };
 	cv::Matx<T,3,3> R { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
@@ -86,11 +88,13 @@ EquiPair<T>::EquiPair(std::shared_ptr<cv::Mat> equi1, std::shared_ptr<cv::Mat> e
 
 	R1NPinv = R1NP.inv();
 	R2NPinv = R2NP.inv();
+
 	equi1_rot.create(this->equi1->size(), this->equi1->type());
 	rotateImages (*(this->equi1), equi1_rot, R1NPinv);
 	equi2_rot.create(this->equi2->size(), this->equi2->type());
 	rotateImages (*(this->equi2), equi2_rot, R2NPinv);
 
+	mt.listRunningTimes();
 }
 
 template<typename T>
@@ -114,7 +118,7 @@ inline void EquiPair<T>::calculateOpposite (const T &theta, const T &phi, T &the
 }
 
 template<typename T>
-void EquiPair<T>::computeEpipole (const cv::Matx<T,3,3> &R, const cv::Matx<T,1,3> &t, cv::Matx<T,1,3> &e1, cv::Matx<T,1,3> &e2) {
+inline void EquiPair<T>::computeEpipole (const cv::Matx<T,3,3> &R, const cv::Matx<T,1,3> &t, cv::Matx<T,1,3> &e1, cv::Matx<T,1,3> &e2) {
 // Computes the epipoles on a pair of images
 // Inputs:
 // 		R 	:the rotation matrix
@@ -141,9 +145,9 @@ inline void EquiPair<T>::Polar2Spherical (const T &theta, const T &phi, cv::Matx
 //		p: the point in spherical coordinates
 
 	// coordinate conversion
-	p(0) = { static_cast<T>(cos(theta) * cos(phi)) };
-	p(1) = { static_cast<T>(sin(theta) * cos(phi)) };
-	p(2) = { static_cast<T>( sin(phi)) };
+	p(0) = static_cast<T>(cos(theta) * cos(phi));
+	p(1) = static_cast<T>(sin(theta) * cos(phi));
+	p(2) = static_cast<T>(sin(phi));
 
 }
 
@@ -176,26 +180,24 @@ inline void EquiPair<T>::Spherical2Polar (const cv::Matx<T,1,3> &v, T &theta, T 
 //			|
 //		  -pi/2
 
-	T x = v(0);
-	T y = v(1);
-	T z = v(2);
+	const T &x = v(0);
+	const T &y = v(1);
+	const T &z = v(2);
 
-	phi = asin (z);
+	phi = asin(z);
 
-
-//	T h = acos(phi);
-	T h = sqrt(x*x + y*y);
+	T h = sqrt(x * x + y * y);
 
 	if (y >= 0) {
-		theta = acos (x / h);
+		theta = acos(x / h);
 	} else {
-		theta = 2 * M_PI - acos (x / h);
+		theta = 2 * M_PI - acos(x / h);
 	}
 
 }
 
 template <typename T>
-void EquiPair<T>::Polar2CartesianEqui (const T &theta, const T &phi, T &x, T &y) {
+inline void EquiPair<T>::Polar2CartesianEqui (const T &theta, const T &phi, T &x, T &y) {
 
 // converts the polar coordinates into cartesian coordinates of the equirectangular image
 // Inputs:
@@ -214,7 +216,7 @@ void EquiPair<T>::Polar2CartesianEqui (const T &theta, const T &phi, T &x, T &y)
 //		theta = 2*pi corresponds to x = width
 
 	x = theta / (2 * M_PI) * width;
-	y = (-phi / M_PI + 0.5) * (height -1);
+	y = (-phi / M_PI + 0.5) * (height - 1);
 
 }
 
@@ -232,12 +234,12 @@ inline void EquiPair<T>::CartesianEqui2Polar (const T &x, const T &y, T &theta, 
 
 	// transforms the pixel coordinate into polar
 	theta = (x / width) * 2 * M_PI;
-	phi = -((y / (height-1)) - 0.5) * M_PI;
+	phi = -((y / (height - 1)) - 0.5) * M_PI;
 }
 
 
 template<typename T>
-void EquiPair<T>::computeRotationMatrix (const cv::Matx<T,1,3> &epipole, const cv::Matx<T,1,3> &northPole, cv::Matx<T,3,3> &RotM){
+inline void EquiPair<T>::computeRotationMatrix (const cv::Matx<T,1,3> &epipole, const cv::Matx<T,1,3> &northPole, cv::Matx<T,3,3> &RotM){
 
 	// calculate the norm of e1
 	T norm_epi = sqrt(epipole(0) * epipole(0) + epipole(1) * epipole(1) + epipole(2) * epipole(2));
@@ -311,7 +313,7 @@ inline T EquiPair<T>::computeAngleBetween (const cv::Matx<T,1,3> &a, const cv::M
 }
 
 template<typename T>
-void EquiPair<T>::rotateImages (const cv::Mat &image_orig, cv::Mat &image_dest, const cv::Matx<T,3,3> & Rinv){
+inline void EquiPair<T>::rotateImages (const cv::Mat &image_orig, cv::Mat &image_dest, const cv::Matx<T,3,3> & Rinv){
 // Rotate image based on the rotation matrix R
 // Inputs:
 //		image_orig	: the original image to transform
@@ -335,10 +337,10 @@ void EquiPair<T>::rotateImages (const cv::Mat &image_orig, cv::Mat &image_dest, 
 	T y_dest { };
 	cv::Point_<T> p_xy_dest { };
 
+	mt.start("1.Coordinate transformation");
 	// Goes through each point of the destination image and find the corresponding x and y coordinate
-	for (int y { 0 }; y < height; ++y) {
-		for (int x { 0 }; x < width; ++x) {
-
+	for (int x { static_cast<int>(width - 1) }; x >= 0; --x) {
+		for (int y { static_cast<int>(height - 1) }; y >= 0; --y) {
 
 			// Converts pixel coordinates to polar coordinates
 			CartesianEqui2Polar (x, y, theta, phi);
@@ -355,15 +357,17 @@ void EquiPair<T>::rotateImages (const cv::Mat &image_orig, cv::Mat &image_dest, 
 			// Converts from polar to pixel coordinates
 			Polar2CartesianEqui (theta_dest, phi_dest, x_dest, y_dest);
 
-
 			posx.at<float>(y,x) = x_dest;
 			posy.at<float>(y,x) = y_dest;
 
 		}
 	}
 
-	cv::remap(image_orig, image_dest, posx, posy, cv::INTER_CUBIC, cv::BORDER_CONSTANT, cv::Scalar(0,0,0));
+	mt.stop("1.Coordinate transformation");
 
+	mt.start("2.Remap");
+	cv::remap(image_orig, image_dest, posx, posy, cv::INTER_CUBIC, cv::BORDER_CONSTANT, cv::Scalar(0,0,0));
+	mt.stop("2.Remap");
 }
 
 
