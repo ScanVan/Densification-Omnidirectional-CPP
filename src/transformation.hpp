@@ -9,6 +9,7 @@
 #include <opencv4/opencv2/imgcodecs.hpp>
 #include <opencv4/opencv2/opencv.hpp>
 #include <opencv4/opencv2/highgui/highgui.hpp>
+#include <opencv4/opencv2/imgproc.hpp>
 
 #include <cmath>
 #include <memory>
@@ -42,6 +43,9 @@ public:
 	cv::Matx<T,3,3> R2NPinv { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	cv::Mat equi1_rot { };
 	cv::Mat equi2_rot { };
+	cv::Mat equi1_rot_g { };
+	cv::Mat equi2_rot_g { };
+
 
 	EquiPair(std::shared_ptr<cv::Mat> equi1, std::shared_ptr<cv::Mat> equi2, cv::Matx<T,3,3> R, cv::Matx<T,1,3> t);
 
@@ -57,11 +61,18 @@ public:
 	inline cv::Matx<T,1,3> crossProduct (const cv::Matx<T,1,3> &a, const cv::Matx<T,1,3> &b);
 	inline T computeAngleBetween (const cv::Matx<T,1,3> &a, const cv::Matx<T,1,3> &b);
 	void rotateImages (const cv::Mat &image_orig, cv::Mat &image_dest, const cv::Matx<T,3,3> & Rinv);
-
-	void polar2cartesianEqui (const T &theta, const T &phi, cv::Point_<T> &p);
 	void calculateOpposite (const T &theta, const T &phi, T &theta_op, T &phi_op);
 
+	void Convert2Gray ();
+
 };
+
+template<typename T>
+void EquiPair<T>::Convert2Gray () {
+	cv::cvtColor (equi1_rot, equi1_rot_g, cv::COLOR_BGR2GRAY);
+	cv::cvtColor (equi2_rot, equi2_rot_g, cv::COLOR_BGR2GRAY);
+}
+
 
 template<typename T>
 EquiPair<T>::EquiPair(std::shared_ptr<cv::Mat> equi1, std::shared_ptr<cv::Mat> equi2, cv::Matx<T,3,3> R, cv::Matx<T,1,3> t) :

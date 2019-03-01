@@ -14,6 +14,7 @@
 #include <opencv4/opencv2/imgcodecs.hpp>
 #include <opencv4/opencv2/opencv.hpp>
 #include <opencv4/opencv2/highgui/highgui.hpp>
+#include <opencv4/opencv2/calib3d.hpp>
 
 #include <cmath>
 #include "transformation.hpp"
@@ -56,17 +57,22 @@ int main() {
 
 	EquiPair<double> eqp {pImg1, pImg2, R, t};
 
+	eqp.Convert2Gray();
+
 	cv::namedWindow("Display window1", cv::WINDOW_KEEPRATIO);
 	cv::imshow("Display window1", *(eqp.equi1));
 	cv::namedWindow("Display window2", cv::WINDOW_KEEPRATIO);
 	cv::imshow("Display window2", *(eqp.equi2));
 
 	cv::namedWindow("Display window1_n", cv::WINDOW_KEEPRATIO);
-	cv::imshow("Display window1_n", eqp.equi1_rot);
+	cv::imshow("Display window1_n", eqp.equi1_rot_g);
 	cv::namedWindow("Display window2_n", cv::WINDOW_KEEPRATIO);
-	cv::imshow("Display window2_n", eqp.equi2_rot);
+	cv::imshow("Display window2_n", eqp.equi2_rot_g);
 
 	cv::waitKey(0);
+
+
+
 
 	cv::imwrite("image1.jpg",*(eqp.equi1));
 	cv::imwrite("image2.jpg",*(eqp.equi2));

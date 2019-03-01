@@ -31,8 +31,18 @@
 *.out
 *.app
 /Debug/
+/bin/
 
 # Data
-/data_in/
+/data_in/20181218-160912-843294.bmp
+/data_in/20181218-160924-593294.bmp
 /data_out/
 *.jpg
+
+# cmake
+CMakeFiles
+bin
+cmake_install.cmake
+Makefile
+!CMakeLists.txt
+CMakeCache.txt
