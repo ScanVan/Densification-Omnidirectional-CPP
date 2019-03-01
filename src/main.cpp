@@ -23,12 +23,24 @@
 int main() {
 
 	cv::Mat image1{};
-	image1 = cv::imread("./data_in/equi1.bmp");
-//	image1 = cv::imread("./data_in/20181218-160912-843294.bmp");
-
 	cv::Mat image2{};
+
+	// Read images from file
+	image1 = cv::imread("./data_in/equi1.bmp");
 	image2 = cv::imread("./data_in/equi2.bmp");
+	// Rotation and translation matrices between the images
+	cv::Matx33d R = cv::Matx33d::eye();
+	cv::Matx13d t {0, 50, 0};
+
+//	// Read images from file
+//	image1 = cv::imread("./data_in/20181218-160912-843294.bmp");
 //	image2 = cv::imread("./data_in/20181218-160924-593294.bmp");
+//	// Rotation and translation matrices between the images
+//	cv::Matx33d R = {0.998927507290289, 0.0452783759684353, 0.00968007481742678,
+//					-0.0450349994790951, 0.998696271463141, -0.0240334389453134,
+//					-0.0107556497120284, 0.0235717210928949, 0.999664288630934};
+//	cv::Matx13d t {0.0443775171597948, 0.647351744454243, -0.0919138857448478};
+
 
 	if (!image1.data) {
 		std::cout << " Could not open or find the image" << std::endl;
@@ -38,15 +50,6 @@ int main() {
 		std::cout << " Could not open or find the image" << std::endl;
 		return -1;
 	}
-
-//	cv::Matx33d R = {0.998927507290289, 0.0452783759684353, 0.00968007481742678,
-//					-0.0450349994790951, 0.998696271463141, -0.0240334389453134,
-//					-0.0107556497120284, 0.0235717210928949, 0.999664288630934};
-//	cv::Matx13d t {0.0443775171597948, 0.647351744454243, -0.0919138857448478};
-
-	// Rotation and translation matrices between the images
-	cv::Matx33d R = cv::Matx33d::eye();
-	cv::Matx13d t {0, 50, 0};
 
 	std::shared_ptr<cv::Mat> pImg1 = std::make_shared<cv::Mat>(image1);
 	std::shared_ptr<cv::Mat> pImg2 = std::make_shared<cv::Mat>(image2);
