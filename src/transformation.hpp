@@ -86,13 +86,13 @@ EquiPair<T>::EquiPair(std::shared_ptr<cv::Mat> equi1, std::shared_ptr<cv::Mat> e
 	Spherical2Polar(e2, e2_theta, e2_phi);
 	Polar2CartesianEqui(e1_theta, e1_phi, e1_x_equi, e1_y_equi);
 	Polar2CartesianEqui(e2_theta, e2_phi, e2_x_equi, e2_y_equi);
-	cv::circle(*(this->equi1), cv::Point_<T>(e1_x_equi, e1_y_equi), 50, cv::Scalar(0,0,255), -1);
-	cv::circle(*(this->equi2), cv::Point_<T>(e2_x_equi, e2_y_equi), 50, cv::Scalar(255,0,0), -1);
+	//cv::circle(*(this->equi1), cv::Point_<T>(e1_x_equi, e1_y_equi), 50, cv::Scalar(0,0,255), -1);
+	//cv::circle(*(this->equi2), cv::Point_<T>(e2_x_equi, e2_y_equi), 50, cv::Scalar(255,0,0), -1);
 
 	calculateOpposite(e2_theta, e2_phi, e2_theta, e2_phi);
 	Polar2Spherical(e2_theta, e2_phi, e2);
 	Polar2CartesianEqui(e2_theta, e2_phi, e2_x_equi, e2_y_equi);
-	cv::circle(*(this->equi2), cv::Point_<T>(e2_x_equi, e2_y_equi), 50, cv::Scalar(0,0,255), -1);
+	//cv::circle(*(this->equi2), cv::Point_<T>(e2_x_equi, e2_y_equi), 50, cv::Scalar(0,0,255), -1);
 
 	computeRotationMatrix(e1, northPole, R1NP);
 	computeRotationMatrix(e2, northPole, R2NP);
@@ -104,6 +104,9 @@ EquiPair<T>::EquiPair(std::shared_ptr<cv::Mat> equi1, std::shared_ptr<cv::Mat> e
 	rotateImages (*(this->equi1), equi1_rot, R1NPinv);
 	equi2_rot.create(this->equi2->size(), this->equi2->type());
 	rotateImages (*(this->equi2), equi2_rot, R2NPinv);
+
+	//cv::resize(equi1_rot, equi1_rot, cv::Size(), 0.10, 0.10, cv::INTER_CUBIC);
+	//cv::resize(equi2_rot, equi2_rot, cv::Size(), 0.10, 0.10, cv::INTER_CUBIC);
 
 	mt.listRunningTimes();
 }

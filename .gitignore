@@ -34,8 +34,7 @@
 /bin/
 
 # Data
-/data_in/20181218-160912-843294.bmp
-/data_in/20181218-160924-593294.bmp
+/data_in/
 /data_out/
 *.jpg
 
@@ -46,3 +45,7 @@ cmake_install.cmake
 Makefile
 !CMakeLists.txt
 CMakeCache.txt
+
+*.bmp
+/results/
+.cproject.old
