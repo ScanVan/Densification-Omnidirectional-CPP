@@ -49,3 +49,5 @@ CMakeCache.txt
 *.bmp
 /results/
 .cproject.old
+*.m
+*.txt

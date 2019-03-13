@@ -75,10 +75,6 @@ int main() {
 	cv::Mat img1 = cv::imread("image2_t.bmp");
 	cv::Mat img2 = cv::imread("image1_t.bmp");
 
-	cv::namedWindow("Display window1", cv::WINDOW_KEEPRATIO);
-	cv::imshow("Display window1", img1);
-	cv::waitKey(0);
-
 //	cv::Vec3b intensity = img1.at<cv::Vec3b>(10,15);
 //	int blue = intensity.val[0];
 //	int green = intensity.val[1];
@@ -86,18 +82,18 @@ int main() {
 //
 //	cout << "Intensity = " << blue <<" " << green << " " << red << std::endl;
 
-
+	cv::resize(img1, img1, cv::Size(), 0.1, 0.1);
+	cv::resize(img2, img2, cv::Size(), 0.1, 0.1);
 
 	EquiGraph<double> eqg {std::make_shared<cv::Mat>(img1), std::make_shared<cv::Mat>(img2)};
 
-	eqg.Convert2Gray1();
+	eqg.Compute();
 
-	for (int y{0}; y<10; ++y) {
-		for (int x{0}; x<10; ++x) {
-			std::cout << eqg.equi1_t_g[y][x] << " ";
-		}
-		std::cout << std::endl;
-	}
+//	cv::namedWindow("Display window1", cv::WINDOW_KEEPRATIO);
+//	cv::imshow("Display window1", img1);
+//	cv::waitKey(0);
+
+	std::cout << "Finished" << std::endl;
 
 	//eqg.Convert2Gray2();
 //	eqg.ComputeMinDistance();
